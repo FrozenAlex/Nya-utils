@@ -14,7 +14,6 @@
 #include "questui/shared/BeatSaberUI.hpp"
 #include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
 
-
 // Necessary
 DEFINE_TYPE(NyaUtils, ImageView);
 
@@ -216,73 +215,55 @@ void NyaUtils::ImageView::dtor()
 }
 
 void NyaUtils::ImageView::DownloadImage(
-  StringW url, 
-  float timeoutInSeconds,
-  std::function<void()> finished
-)
+    StringW url,
+    float timeoutInSeconds,
+    std::function<void(bool success, long HTTPCode)> finished)
 {
-  WebUtils::GetAsync(
-      url,
-      timeoutInSeconds,
-      [&, finished](long code, std::string result)
-      {
-          switch (code)
+  const std::string imageURL = url;
+  WebUtils::GetAsync(url, 10.0, [this, imageURL, finished](long code, std::string result)
+                     {
+        std::vector<uint8_t> bytes(result.begin(), result.end());
+        if (code != 200)
+        {
+          if (finished != nullptr)
           {
-              case 200:
-                  rapidjson::Document document;
-                  document.Parse(result);
-                  if(document.HasParseError() || !document.IsObject())
-                      return;
-                  std::string url = "";
-                  if(document.HasMember("url"))
-                  {
-                      url = document.FindMember("url")->value.GetString();
-                  }
-                  il2cpp_utils::getLogger().debug("%s", url.c_str());
-                  
-                  WebUtils::GetAsync(url, 10.0, [this, url, finished](long code, std::string result){
-                      std::vector<uint8_t> bytes(result.begin(), result.end());
-                      
-                      il2cpp_utils::getLogger().debug("Downloaded Image!");
-                      il2cpp_utils::getLogger().debug("%lu", bytes.size());
-                      switch (code)
-                      {
-                          case 200:
-                              if(url.find(".gif") != std::string::npos) {
-                                  il2cpp_utils::getLogger().debug("Found a gif");
-                                      QuestUI::MainThreadScheduler::Schedule([this, result, finished]
-                                      {
-                                          std::string resCopy = result;
+            finished(false, code);
+          }
+          return;
+        }
+        if (imageURL.find(".gif") != std::string::npos)
+        {
+          QuestUI::MainThreadScheduler::Schedule([this, result, finished]
+            {
+              std::string resCopy = result;
 
-                                          // Decode the gif
-                                          Gif gif(resCopy);
-                                          int parseResult = gif.Parse();
-                                          int slurpResult = gif.Slurp();
-                                          int width = gif.get_width();
-                                          int height = gif.get_height();
-                                          int length = gif.get_length();
-                                          AllFramesResult result = gif.get_all_frames();
-                                          
-                          
-                                       this->UpdateImage(result.frames, result.timings,  (float)width, (float)height);
-                                          if (finished != nullptr) {
-                                            finished();
-                                          }
-                                      });
-                              } else {
-                                  il2cpp_utils::getLogger().debug("Static image");
-                                  QuestUI::MainThreadScheduler::Schedule([this, bytes, finished]
-                                  {  
-                                      UnityEngine::Sprite* sprite = QuestUI::BeatSaberUI::VectorToSprite(bytes);
-                                      this->UpdateStaticImage(sprite);
-                                      if (finished != nullptr) {
-                                         finished();
-                                      }
-                                     
-                                  });
-                              }
-                      }
-                  });
-                  break;
-          } });
+              // Decode the gif
+              Gif gif(resCopy);
+              int parseResult = gif.Parse();
+              int slurpResult = gif.Slurp();
+              int width = gif.get_width();
+              int height = gif.get_height();
+              int length = gif.get_length();
+              AllFramesResult result = gif.get_all_frames();
+          
+              this->UpdateImage(result.frames, result.timings,  (float)width, (float)height);
+              if (finished != nullptr) {
+                finished(true, 200);
+              } 
+            }
+          );
+        }
+        else
+        {
+          QuestUI::MainThreadScheduler::Schedule([this, bytes, finished]
+            {
+              UnityEngine::Sprite *sprite = QuestUI::BeatSaberUI::VectorToSprite(bytes);
+              this->UpdateStaticImage(sprite);
+              if (finished != nullptr)
+              {
+                finished(true, 200);
+              }
+            }
+          );
+        } });
 }
