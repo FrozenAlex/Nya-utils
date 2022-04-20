@@ -21,7 +21,6 @@ DECLARE_CLASS_CODEGEN(NyaUtils, ImageView, UnityEngine::MonoBehaviour,
     DECLARE_INSTANCE_METHOD(void, UpdateStaticImage, UnityEngine::Sprite* image);
     DECLARE_INSTANCE_METHOD(void, cleanupTextures);
     
-    
     DECLARE_CTOR(ctor);
     DECLARE_DTOR(dtor);
 
@@ -32,7 +31,6 @@ DECLARE_CLASS_CODEGEN(NyaUtils, ImageView, UnityEngine::MonoBehaviour,
 
     DECLARE_INSTANCE_FIELD(float, width);
     DECLARE_INSTANCE_FIELD(float, height);
-
 
     DECLARE_INSTANCE_FIELD(HMUI::ImageView*, imageView);
     DECLARE_INSTANCE_FIELD(UnityEngine::Texture2D*, texture);

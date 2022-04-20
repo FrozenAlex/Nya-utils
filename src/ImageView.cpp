@@ -224,7 +224,7 @@ void NyaUtils::ImageView::DownloadImage(
   WebUtils::GetAsync(
       url,
       timeoutInSeconds,
-      [&](long code, std::string result)
+      [&, finished](long code, std::string result)
       {
           switch (code)
           {
@@ -240,7 +240,7 @@ void NyaUtils::ImageView::DownloadImage(
                   }
                   il2cpp_utils::getLogger().debug("%s", url.c_str());
                   
-                  WebUtils::GetAsync(url, 10.0, [this, url,finished](long code, std::string result){
+                  WebUtils::GetAsync(url, 10.0, [this, url, finished](long code, std::string result){
                       std::vector<uint8_t> bytes(result.begin(), result.end());
                       
                       il2cpp_utils::getLogger().debug("Downloaded Image!");
@@ -264,8 +264,7 @@ void NyaUtils::ImageView::DownloadImage(
                                           AllFramesResult result = gif.get_all_frames();
                                           
                           
-                                          
-                                          this->UpdateImage(result.frames, result.timings,  (float)width, (float)height);
+                                       this->UpdateImage(result.frames, result.timings,  (float)width, (float)height);
                                           if (finished != nullptr) {
                                             finished();
                                           }
@@ -273,7 +272,7 @@ void NyaUtils::ImageView::DownloadImage(
                               } else {
                                   il2cpp_utils::getLogger().debug("Static image");
                                   QuestUI::MainThreadScheduler::Schedule([this, bytes, finished]
-                                  {
+                                  {  
                                       UnityEngine::Sprite* sprite = QuestUI::BeatSaberUI::VectorToSprite(bytes);
                                       this->UpdateStaticImage(sprite);
                                       if (finished != nullptr) {
