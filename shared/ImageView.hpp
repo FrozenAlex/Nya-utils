@@ -15,7 +15,8 @@
 DECLARE_CLASS_CODEGEN(NyaUtils, ImageView, UnityEngine::MonoBehaviour,
   public:
     void DownloadImage(StringW url, float timeoutInSeconds = 10.0f, std::function<void(bool success, long HTTPCode)> finished = nullptr);
-
+    // EXPERIMENTAL load file from path function, does not support gifs at the moment
+    void LoadFile(StringW url, std::function<void(bool success)> finished = nullptr);
     DECLARE_INSTANCE_METHOD(void, Update);
     DECLARE_INSTANCE_METHOD(void, UpdateImage, ArrayW<UnityEngine::Texture2D*> frames, ArrayW<float> timings , float ImageWidth, float ImageHeight);
     DECLARE_INSTANCE_METHOD(void, UpdateStaticImage, UnityEngine::Sprite* image);

@@ -1,5 +1,7 @@
 #define RAPIDJSON_HAS_STDSTRING 1
 // OurClass.cpp
+#include <fstream>
+#include <iostream>
 #include "ImageView.hpp"
 #include "UnityEngine/Texture2D.hpp"
 #include "UnityEngine/MonoBehaviour.hpp"
@@ -231,6 +233,8 @@ void NyaUtils::ImageView::DownloadImage(
           }
           return;
         }
+
+        // TODO: Find a better way lol
         if (imageURL.find(".gif") != std::string::npos)
         {
           QuestUI::MainThreadScheduler::Schedule([this, result, finished]
@@ -266,4 +270,59 @@ void NyaUtils::ImageView::DownloadImage(
             }
           );
         } });
+}
+
+void NyaUtils::ImageView::LoadFile(
+    StringW path,
+    std::function<void(bool success)> finished)
+{
+  std::string filePath = path;
+
+  if (filePath.find(".gif") != std::string::npos)
+  {
+    QuestUI::MainThreadScheduler::Schedule([this, filePath, finished]{
+   
+              GifFile gif;
+              int parseResult = gif.ParseFile(filePath);
+
+              if (parseResult != 0) {
+                if (finished != nullptr) finished(false);
+                return;
+              }
+
+              int slurpResult = gif.Slurp();
+              int width = gif.get_width();
+              int height = gif.get_height();
+              int length = gif.get_length();
+              AllFramesResult result = gif.get_all_frames();
+
+              this->UpdateImage(result.frames, result.timings,  (float)width, (float)height);
+
+
+              if (finished != nullptr) {
+                finished(true);
+              } 
+            });
+  }
+  else if (
+      filePath.find(".png") != std::string::npos ||
+      filePath.find(".jpg") != std::string::npos ||
+      filePath.find(".jpeg") != std::string::npos ||
+      filePath.find(".webp") != std::string::npos)
+  {
+
+    QuestUI::MainThreadScheduler::Schedule([this, filePath, finished]
+                                           {
+                UnityEngine::Sprite* sprite = QuestUI::BeatSaberUI::FileToSprite(filePath);
+                if (sprite != nullptr) {
+                  this->UpdateStaticImage(sprite);
+                  if (finished != nullptr) finished(true);
+                } else {
+                  if (finished != nullptr) finished(false);
+               } });
+  }
+  else
+  {
+    if (finished != nullptr)finished(false);
+  }
 }
