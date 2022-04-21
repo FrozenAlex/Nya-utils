@@ -5,7 +5,7 @@
     "name": "NyaUtils",
     "id": "nya-utils",
     "version": "0.1.0",
-    "url": "https://github.com/FrozenAlex/Nya-utils.git",
+    "url": "https://github.com/FrozenAlex/Nya-utils",
     "additionalData": {
       "overrideSoName": "libnya-utils.so"
     }
