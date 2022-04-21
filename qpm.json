@@ -7,7 +7,11 @@
     "version": "0.1.0",
     "url": "https://github.com/FrozenAlex/Nya-utils.git",
     "additionalData": {
-      "overrideSoName": "libnya-utils.so"
+      "soLink": "https://github.com/FrozenAlex/Nya-utils/releases/download/v0.1.0/libnya-utils.so",
+      "debugSoLink": "https://github.com/FrozenAlex/Nya-utils/releases/download/v0.1.0/debug_libnya-utils.so",
+      "overrideSoName": "libnya-utils.so",
+      "modLink": "https://github.com/FrozenAlex/Nya-utils/releases/download/v0.1.0/NyaUtils.qmod",
+      "branchName": "version-v0.1.0"
     }
   },
   "dependencies": [
