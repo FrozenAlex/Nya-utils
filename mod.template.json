@@ -9,12 +9,8 @@
   "description": "${mod_id}, version ${version}!",
   "isLibrary": true,
   "dependencies": [],
-  "modFiles": [
-		"libnya-utils.so"
-	],
-	"libraryFiles": [
-		"libbeatsaber-hook_3_8_1.so"
-	],
+  "modFiles": [],
+	"libraryFiles": [],
   "fileCopies": [],
   "copyExtensions": []
 }

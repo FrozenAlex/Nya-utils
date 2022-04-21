@@ -25,9 +25,7 @@
       "downloadIfMissing": "https://github.com/darknight1050/questui/releases/download/v0.13.5/QuestUI.qmod"
     }
   ],
-  "modFiles": [
-    "libnya-utils.so"
-  ],
+  "modFiles": [],
   "libraryFiles": [
     "libnya-utils.so"
   ],
