@@ -1,7 +1,7 @@
 name: NDK build
 
 env:
-  module_id: NyaUtils
+  module_id: nya-utils
   qmodName: NyaUtils
   cache-name: Nya_cache
 

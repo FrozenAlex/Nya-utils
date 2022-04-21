@@ -7,7 +7,7 @@
     "version": "0.1.0",
     "url": "https://github.com/FrozenAlex/Nya-utils.git",
     "additionalData": {
-      "overrideSoName": "libNyaUtils.so"
+      "overrideSoName": "libnya-utils.so"
     }
   },
   "dependencies": [

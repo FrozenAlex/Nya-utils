@@ -12,7 +12,7 @@
 	],
 	"isLibrary": true,
 	"modFiles": [
-		"libNyaUtils.so"
+		"libnya-utils.so"
 	],
 	"libraryFiles": [
 		"libbeatsaber-hook_3_8_1.so"
