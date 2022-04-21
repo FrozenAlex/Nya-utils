@@ -1,0 +1,20 @@
+{
+  "_QPVersion": "0.1.2",
+  "name": "${mod_name}",
+  "id": "${mod_id}",
+  "author": "FrozenAlex",
+  "version": "${version}",
+  "packageId": "com.beatgames.beatsaber",
+  "packageVersion": "1.21.0",
+  "description": "${mod_id}, version ${version}!",
+  "isLibrary": true,
+  "dependencies": [],
+  "modFiles": [
+		"libnya-utils.so"
+	],
+	"libraryFiles": [
+		"libbeatsaber-hook_3_8_1.so"
+	],
+  "fileCopies": [],
+  "copyExtensions": []
+}
