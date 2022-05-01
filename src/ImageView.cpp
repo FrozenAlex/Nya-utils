@@ -272,13 +272,26 @@ void NyaUtils::ImageView::DownloadImage(
         } });
 }
 
+/*
+ * Find Case Insensitive Sub String in a given substring
+ */
+size_t findCaseInsensitive(std::string data, std::string toSearch, size_t pos = 0)
+{
+    // Convert complete given String to lower case
+    std::transform(data.begin(), data.end(), data.begin(), ::tolower);
+    // Convert complete given Sub String to lower case
+    std::transform(toSearch.begin(), toSearch.end(), toSearch.begin(), ::tolower);
+    // Find sub string in given string
+    return data.find(toSearch, pos);
+}
+
 void NyaUtils::ImageView::LoadFile(
     StringW path,
     std::function<void(bool success)> finished)
 {
   std::string filePath = path;
 
-  if (filePath.find(".gif") != std::string::npos)
+  if (findCaseInsensitive(filePath, ".gif")  != std::string::npos)
   {
     QuestUI::MainThreadScheduler::Schedule([this, filePath, finished]{
    
@@ -305,10 +318,13 @@ void NyaUtils::ImageView::LoadFile(
             });
   }
   else if (
-      filePath.find(".png") != std::string::npos ||
-      filePath.find(".jpg") != std::string::npos ||
-      filePath.find(".jpeg") != std::string::npos ||
-      filePath.find(".webp") != std::string::npos)
+      findCaseInsensitive(filePath, ".png") != std::string::npos ||
+      findCaseInsensitive(filePath, ".jpg") != std::string::npos ||
+      findCaseInsensitive(filePath, ".jpeg") != std::string::npos ||
+      findCaseInsensitive(filePath, ".webp") != std::string::npos ||
+      findCaseInsensitive(filePath, ".bmp") != std::string::npos  ||
+      findCaseInsensitive(filePath, ".tiff") != std::string::npos
+      )
   {
 
     QuestUI::MainThreadScheduler::Schedule([this, filePath, finished]
