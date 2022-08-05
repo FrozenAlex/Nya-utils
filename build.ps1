@@ -31,6 +31,6 @@ if (($clean.IsPresent) -or (-not (Test-Path -Path "build")))
 } 
 
 cd build
-& cmake -G "Ninja" -DCMAKE_BUILD_TYPE="RelWithDebInfo" ../
+& cmake -G "Ninja" -DCMAKE_BUILD_TYPE="Debug" ../
 & cmake --build .
 cd ..

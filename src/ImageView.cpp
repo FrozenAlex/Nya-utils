@@ -1,13 +1,16 @@
 #define RAPIDJSON_HAS_STDSTRING 1
 // OurClass.cpp
+
 #include <fstream>
 #include <iostream>
 #include "ImageView.hpp"
 #include "UnityEngine/Texture2D.hpp"
 #include "UnityEngine/MonoBehaviour.hpp"
+#include "UnityEngine/RenderTexture.hpp"
 #include "UnityEngine/GameObject.hpp"
 #include "UnityEngine/Sprite.hpp"
 #include "UnityEngine/Time.hpp"
+#include "UnityEngine/GameObject.hpp"
 #include "UnityEngine/SpriteMeshType.hpp"
 #include "HMUI/ImageView.hpp"
 #include "WebUtils.hpp"
@@ -32,16 +35,18 @@ void NyaUtils::ImageView::ctor()
   height = 0.0f;
   ArrayW<float> animationTimings;
   ArrayW<UnityEngine::Texture2D *> animationFrames;
+  
   play = false;
 
   imageView = this->get_gameObject()->GetComponent<HMUI::ImageView *>();
+  isVideo = false;
   // Constructor!
 }
 
 // Update
 void NyaUtils::ImageView::Update()
 {
-  if (play)
+  if (play && !isVideo)
   {
     int length = animationFrames.Length();
     if (length > 0)
@@ -91,6 +96,7 @@ void NyaUtils::ImageView::Update()
             else
             {
               canvasRenderer->SetTexture(frame);
+              
             }
           }
         }
@@ -242,18 +248,29 @@ void NyaUtils::ImageView::DownloadImage(
               std::string resCopy = result;
 
               // Decode the gif
-              Gif gif(resCopy);
-              int parseResult = gif.Parse();
-              int slurpResult = gif.Slurp();
-              int width = gif.get_width();
-              int height = gif.get_height();
-              int length = gif.get_length();
-              AllFramesResult result = gif.get_all_frames();
-          
-              this->UpdateImage(result.frames, result.timings,  (float)width, (float)height);
-              if (finished != nullptr) {
-                finished(true, 200);
-              } 
+              GifDecoder* gif = new GifDecoder(resCopy);
+              gif->DecodeIntoFrames([this, gif, finished](bool success){
+                if (success) {
+                  QuestUI::MainThreadScheduler::Schedule([this, gif, finished]{
+                    gif->ConvertToTextures([this, gif,finished](AllFramesResult result){
+                      int width = gif->get_width();
+                      int height = gif->get_height();
+                      this->UpdateImage(result.frames, result.timings,  (float)width, (float)height);
+
+                      // Free the gif
+                      delete gif;
+
+                      if (finished != nullptr) {
+                        finished(true, 200);
+                      }
+                    });
+                  });
+                } else {
+                  if (finished != nullptr) {
+                    finished(false, 200);
+                  }
+                }
+              });  
             }
           );
         }
@@ -294,27 +311,36 @@ void NyaUtils::ImageView::LoadFile(
   if (findCaseInsensitive(filePath, ".gif")  != std::string::npos)
   {
     QuestUI::MainThreadScheduler::Schedule([this, filePath, finished]{
-   
-              GifFile gif;
-              int parseResult = gif.ParseFile(filePath);
+              GifDecoder* gif = new GifDecoder();
+              int parseResult = gif->ParseFile(filePath);
 
               if (parseResult != 0) {
                 if (finished != nullptr) finished(false);
                 return;
               }
 
-              int slurpResult = gif.Slurp();
-              int width = gif.get_width();
-              int height = gif.get_height();
-              int length = gif.get_length();
-              AllFramesResult result = gif.get_all_frames();
+              gif->DecodeIntoFrames([this, gif, finished](bool success){
+                if (success) {
+                  QuestUI::MainThreadScheduler::Schedule([this, gif, finished]{
+                    gif->ConvertToTextures([this, gif,finished](AllFramesResult result){
+                      int width = gif->get_width();
+                      int height = gif->get_height();
+                      this->UpdateImage(result.frames, result.timings,  (float)width, (float)height);
 
-              this->UpdateImage(result.frames, result.timings,  (float)width, (float)height);
+                      // Free the gif
+                      delete gif;
 
-
-              if (finished != nullptr) {
-                finished(true);
-              } 
+                      if (finished != nullptr) {
+                        finished(true);
+                      }
+                    });
+                  });
+                } else {
+                  if (finished != nullptr) {
+                    finished(false);
+                  }
+                }
+              });              
             });
   }
   else if (
@@ -337,6 +363,41 @@ void NyaUtils::ImageView::LoadFile(
                   if (finished != nullptr) finished(false);
                } });
   }
+  // else if ( findCaseInsensitive(filePath, ".mp4") != std::string::npos)
+  // {
+  //     il2cpp_utils::getLogger().warning("Found mp4");
+  //     play = true;
+  //     isVideo = true;
+
+  //     this->cleanupTextures();
+
+  //     auto meshRenderer = this->get_gameObject()->GetComponent<Renderer*>();
+  //     GameObject* camera = GameObject::Find("Main Camera");
+
+      
+  //     Cinema::VideoPlayer* videoPlayer = camera->AddComponent<Cinema::VideoPlayer*>();
+  //     videoPlayer->set_isLooping(true);
+  //     videoPlayer->set_playOnAwake(false);
+  //     videoPlayer->set_renderMode(Video::VideoRenderMode::CameraNearPlane);
+  //     videoPlayer->set_audioOutputMode(Video::VideoAudioOutputMode::None);
+  //     videoPlayer->set_aspectRatio(Video::VideoAspectRatio::FitInside);
+  //     // videoPlayer->ta
+  //     // RenderTexture* texture = RenderTexture::New_ctor(200,200, 32);
+  //     if(meshRenderer){
+  //       il2cpp_utils::getLogger().warning("Found renderer");
+  //       videoPlayer->set_renderer(meshRenderer);
+  //     } else {
+
+  //       // auto meshRenderer = this->imageView->GetComponent<Renderer*>();
+ 
+  //     }
+          
+  //     videoPlayer->set_url(path);
+    
+  //     videoPlayer->Play();
+  //     currentFrame = 0;
+  //     finished(true);
+  // }
   else
   {
     if (finished != nullptr)finished(false);

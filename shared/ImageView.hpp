@@ -1,6 +1,7 @@
 // OurClass.hpp
 #pragma once
 
+#include "Cinema.hpp"
 #include "custom-types/shared/types.hpp"
 #include "custom-types/shared/macros.hpp"
 #include "Gif.hpp"
@@ -20,6 +21,7 @@ DECLARE_CLASS_CODEGEN(NyaUtils, ImageView, UnityEngine::MonoBehaviour,
     DECLARE_INSTANCE_METHOD(void, Update);
     DECLARE_INSTANCE_METHOD(void, UpdateImage, ArrayW<UnityEngine::Texture2D*> frames, ArrayW<float> timings , float ImageWidth, float ImageHeight);
     DECLARE_INSTANCE_METHOD(void, UpdateStaticImage, UnityEngine::Sprite* image);
+    // DECLARE_INSTANCE_METHOD(void, UpdateVideoImage, std::string localPath);
     DECLARE_INSTANCE_METHOD(void, cleanupTextures);
     
     DECLARE_CTOR(ctor);
@@ -29,6 +31,7 @@ DECLARE_CLASS_CODEGEN(NyaUtils, ImageView, UnityEngine::MonoBehaviour,
     DECLARE_INSTANCE_FIELD(int, currentFrame);
     DECLARE_INSTANCE_FIELD(float, frameTime);
     DECLARE_INSTANCE_FIELD(bool, play);
+    DECLARE_INSTANCE_FIELD(bool, isVideo);
 
     DECLARE_INSTANCE_FIELD(float, width);
     DECLARE_INSTANCE_FIELD(float, height);
